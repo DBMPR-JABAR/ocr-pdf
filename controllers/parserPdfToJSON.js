@@ -57,7 +57,7 @@ function getRowRencana(row) {
 }
 
 function detectFloatingNumber(text) {
-  const regex = /^\d+\.\d+$/;
+  const regex = /^[+-]?([0-9]{1,2})(([,.]{1})([0-9]{1,3}))?$/;
   return text.length >= 5 && text.length <= 6 && regex.test(text);
 }
 

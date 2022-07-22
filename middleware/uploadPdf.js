@@ -4,7 +4,7 @@ const dotenv = require("dotenv").config();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, Process.env.UPLOAD_PATH));
+    cb(null, path.join(__dirname, process.env.UPLOAD_PATH));
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
