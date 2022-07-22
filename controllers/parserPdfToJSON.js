@@ -15,29 +15,25 @@ const pdfController = {
         });
       });
 
-      const headers = [
-        "Rencana",
-        "Realisasi",
-        "Deviasi",
-        "Rencana K3",
-        "Realisasi K3",
-        "Deviasi K3",
-      ];
       var fixValue = [];
       tableRow.forEach((table) => {
         if (table.filter(detectFloatingNumber).length > 0) {
           fixValue.push(table.filter(detectFloatingNumber));
         }
       });
-      fixValue.forEach((table) => {
-        table.length = headers.length;
-      });
 
       return res.status(200).json({
         message: "Success",
         data: {
-          headers,
-          fixValue,
+          rencana:
+            parseFloat(fixValue[0][0]) +
+            parseFloat(fixValue[0][3] == null ? 0 : fixValue[0][3]),
+          realisasi:
+            parseFloat(fixValue[0][1]) +
+            parseFloat(fixValue[0][4] == null ? 0 : fixValue[0][4]),
+          deviasi:
+            parseFloat(fixValue[0][2]) +
+            parseFloat(fixValue[0][5] == null ? 0 : fixValue[0][5]),
         },
       });
     } catch (error) {
