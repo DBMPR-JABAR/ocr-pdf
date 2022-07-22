@@ -34,6 +34,7 @@ const pdfController = {
           deviasi:
             parseFloat(fixValue[0][2]) +
             parseFloat(fixValue[0][5] == null ? 0 : fixValue[0][5]),
+          filePath: file.path,
         },
       });
     } catch (error) {
