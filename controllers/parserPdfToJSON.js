@@ -4,8 +4,8 @@ var pdf_table_extractor = require("pdf-table-extractor");
 var jsonData;
 const pdfController = {
   parse: async (req, res) => {
+    const file = req.file;
     try {
-      const file = req.file;
       var tableRow = [];
       await pdf_table_extractor(file.path, success, error);
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -38,6 +38,9 @@ const pdfController = {
         },
       });
     } catch (error) {
+      fs.unlink(file.path, (err) => {
+        if (err) throw err;
+      });
       return res.status(500).json({
         message: "Error",
         data: {
