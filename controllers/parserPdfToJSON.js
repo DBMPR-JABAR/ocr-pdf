@@ -1,39 +1,24 @@
 const fs = require("fs");
-var pdf_table_extractor = require("pdf-table-extractor");
+const { PdfReader } = require("pdfreader");
 
-var jsonData;
 const pdfController = {
   parse: async (req, res) => {
-    const file = req.file;
     try {
-      var tableRow = [];
-      await pdf_table_extractor(file.path, success, error);
+      const file = req.file;
+      const data = await readFile(file.path);
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      await jsonData.pageTables.forEach((table) => {
-        table.tables.forEach((row) => {
-          tableRow.push(row);
-        });
-      });
-
       var fixValue = [];
-      tableRow.forEach((table) => {
-        if (table.filter(detectFloatingNumber).length > 0) {
-          fixValue.push(table.filter(detectFloatingNumber));
+      data.forEach((text) => {
+        if (detectFloatingNumber(text)) {
+          fixValue.push(text.includes(".") ? text : text.replace(",", "."));
         }
       });
-
       return res.status(200).json({
         message: "Success",
         data: {
-          rencana:
-            parseFloat(fixValue[0][0]) +
-            parseFloat(fixValue[0][3] == null ? 0 : fixValue[0][3]),
-          realisasi:
-            parseFloat(fixValue[0][1]) +
-            parseFloat(fixValue[0][4] == null ? 0 : fixValue[0][4]),
-          deviasi:
-            parseFloat(fixValue[0][2]) +
-            parseFloat(fixValue[0][5] == null ? 0 : fixValue[0][5]),
+          rencana: parseFloat(fixValue[0]),
+          realisasi: parseFloat(fixValue[1]),
+          deviasi: parseFloat(fixValue[2]),
           filePath: file.path,
         },
       });
@@ -60,14 +45,18 @@ function detectFloatingNumber(text) {
   return text.length >= 5 && text.length <= 6 && regex.test(text);
 }
 
-//PDF parsed
-function success(result) {
-  jsonData = result;
-}
-
-//Error
-function error(err) {
-  console.error("Error: " + err);
+async function readFile(path) {
+  const jsonData = [];
+  Promise.resolve(
+    new PdfReader().parseFileItems(path, (err, item) => {
+      if (err) console.error("error:", err);
+      else if (!item) console.warn("end of file");
+      else if (item.text) {
+        jsonData.push(item.text);
+      }
+    })
+  );
+  return jsonData;
 }
 
 module.exports = pdfController;
